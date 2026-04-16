@@ -55,8 +55,8 @@ get_field3() {
 # ── 1. system packages ────────────────────────────────────────
 
 info "Installing system packages..."
-sudo pacman -S --needed --noconfirm python311 tk 2>/dev/null || die "pacman failed"
-success "python311 + tk installed"
+sudo pacman -S --needed --noconfirm python311 tk usbmuxd libimobiledevice 2>/dev/null || die "pacman failed"
+success "python311 + tk + usbmuxd + libimobiledevice installed"
 
 # ── 2. directories ───────────────────────────────────────────
 
