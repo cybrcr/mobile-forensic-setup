@@ -89,6 +89,16 @@ for entry in "${REPOS[@]}"; do
     "$dir/.venv/bin/pip" install -q --upgrade pip
     "$dir/.venv/bin/pip" install -q -r "$dir/requirements.txt"
 
+    # GUI fix for iLEAPP and ALEAPP (make resizable and significantly shorter)
+    if [[ "$name" == "iLEAPP" || "$name" == "ALEAPP" ]]; then
+        info "[$name] Applying GUI scaling fix..."
+        sed -i 's/resizable(False, False)/resizable(True, True)/g' "$dir/$main_script"
+        sed -i 's/window_height = 620/window_height = 540/g' "$dir/$main_script"
+        # Reduce list and log heights to fit on small screens
+        sed -i '/elif is_platform_linux():/,/else:/ s/mlist_window_height = 17/mlist_window_height = 10/' "$dir/$main_script"
+        sed -i '/elif is_platform_linux():/,/else:/ s/log_text_height = 28/log_text_height = 15/' "$dir/$main_script"
+    fi
+
     info "[$name] Creating start script..."
     cat > "$dir/start.sh" <<EOF
 #!/bin/bash
@@ -145,6 +155,17 @@ for tool in "${TOOLS[@]}"; do
     git -C "$dir" pull
     echo "    Installing requirements..."
     "$dir/.venv/bin/pip" install -q --upgrade -r "$dir/requirements.txt"
+    
+    # Re-apply GUI fix for iLEAPP and ALEAPP
+    if [[ "$tool" == "iLEAPP" || "$tool" == "ALEAPP" ]]; then
+        echo "    Applying GUI scaling fix..."
+        main_script="${tool,,}GUI.py"
+        sed -i 's/resizable(False, False)/resizable(True, True)/g' "$dir/$main_script"
+        sed -i 's/window_height = 620/window_height = 540/g' "$dir/$main_script"
+        sed -i '\''/elif is_platform_linux():/,/else:/ s/mlist_window_height = 17/mlist_window_height = 10/'\'' "$dir/$main_script"
+        sed -i '\''/elif is_platform_linux():/,/else:/ s/log_text_height = 28/log_text_height = 15/'\'' "$dir/$main_script"
+    fi
+
     echo "    $tool done."
     echo
 done
